@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:tasky/models/task_model.dart';
 import 'package:tasky/pages/detail_task_page.dart';
@@ -20,18 +21,24 @@ class DashboardPage extends StatefulWidget {
 class _DashboardPageState extends State<DashboardPage> {
   TaskService taskService = getIt();
 
-  late Future<List<Task>> _tasks;
+  late Future<List<Task>> _dailyTasks;
+  late Future<List<Task>> _priorityTasks;
   late String _currentDate;
 
   @override
   void initState() {
     super.initState();
-    _tasks = getAllTasks();
+    _dailyTasks = getDailyTasks();
+    _priorityTasks = getPriorityTasks();
     _currentDate = DateFormat('EEEE, dd MMMM yyyy').format(DateTime.now());
   }
 
-  Future<List<Task>> getAllTasks() async {
-    return await taskService.getAll();
+  Future<List<Task>> getDailyTasks() async {
+    return await taskService.filterByCategory(Category.daily.name);
+  }
+
+  Future<List<Task>> getPriorityTasks() async {
+    return await taskService.filterByCategory(Category.priority.name);
   }
 
   Future<Task> updateTask(String id, Task newTask) async {
@@ -40,23 +47,74 @@ class _DashboardPageState extends State<DashboardPage> {
 
   Future<void> toggleCheckedTask(String id) async {
     await taskService.toggleChecked(id);
-    setState(() {
-      _tasks = getAllTasks();
-    });
+    _refreshTasks();
   }
 
   void addTask() {
-    Navigator.pushNamed(context, "/add-task").then((value) => setState(() {
-          _tasks = getAllTasks();
-        }));
+    Navigator.pushNamed(context, "/add-task").then((value) => _refreshTasks());
   }
 
   void navigateToDetailTask(String id) {
     Navigator.push(context, MaterialPageRoute(builder: (context) {
       return DetailTaskPage(taskId: id);
-    })).then((value) => setState(() {
-          _tasks = getAllTasks();
-        }));
+    })).then((value) => _refreshTasks());
+  }
+
+  void _refreshTasks() {
+    setState(() {
+      _dailyTasks = getDailyTasks();
+      _priorityTasks = getPriorityTasks();
+    });
+  }
+
+  Widget _buildTaskListByCategory(Category category) {
+    Future<List<Task>> tasks;
+    switch (category) {
+      case Category.daily:
+        tasks = _dailyTasks;
+        break;
+      case Category.priority:
+        tasks = _priorityTasks;
+        break;
+      default:
+        tasks = Future.value([]);
+    }
+
+    return ExpansionTile(
+      initiallyExpanded: true,
+      title: Text("${toBeginningOfSentenceCase(category.name)} Task",
+          style: const TextStyle(
+            fontSize: 24.0,
+            fontWeight: FontWeight.bold,
+          )),
+      children: [
+        FutureBuilder(
+            future: tasks,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (snapshot.data!.isEmpty) {
+                return const Text("Nothing to do here :)");
+              } else {
+                var children = snapshot.data!
+                    .map((task) => Padding(
+                          padding: const EdgeInsets.only(bottom: 8.0),
+                          child: TaskCard(
+                            task: task,
+                            toggleCheck: () {
+                              toggleCheckedTask(task.id);
+                            },
+                            onPressed: () {
+                              navigateToDetailTask(task.id);
+                            },
+                          ),
+                        ))
+                    .toList();
+                return Column(children: children);
+              }
+            })
+      ],
+    );
   }
 
   @override
@@ -79,44 +137,13 @@ class _DashboardPageState extends State<DashboardPage> {
                 style: Theme.of(context).textTheme.bodyLarge,
               ),
               const SizedBox(height: 32.0),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text("Daily Task",
-                      style: TextStyle(
-                        fontSize: 24.0,
-                        fontWeight: FontWeight.bold,
-                      )),
-                  PrimaryButton(
-                      onPressed: addTask, child: const Text("+ Add task")),
-                ],
+              Align(
+                alignment: Alignment.centerRight,
+                child: PrimaryButton(
+                    onPressed: addTask, child: const Text("+ Add task")),
               ),
-              const SizedBox(height: 16.0),
-              FutureBuilder(
-                  future: _tasks,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
-                    } else if (snapshot.data!.isEmpty) {
-                      return const Text("Nothing to do here :)");
-                    } else {
-                      var children = snapshot.data!
-                          .map((task) => Padding(
-                                padding: const EdgeInsets.only(bottom: 8.0),
-                                child: TaskCard(
-                                  task: task,
-                                  toggleCheck: () {
-                                    toggleCheckedTask(task.id);
-                                  },
-                                  onPressed: () {
-                                    navigateToDetailTask(task.id);
-                                  },
-                                ),
-                              ))
-                          .toList();
-                      return Column(children: children);
-                    }
-                  })
+              for (var category in Category.values)
+                _buildTaskListByCategory(category),
             ],
           ),
         ),
