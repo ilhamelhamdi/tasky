@@ -5,9 +5,10 @@ import 'package:tasky/models/task_model.dart';
 import 'package:tasky/service_locator.dart';
 import 'package:tasky/services/task_service.dart';
 import 'package:tasky/widgets/custom_text_field.dart';
-import 'package:tasky/widgets/datetime_button.dart';
+import 'package:tasky/widgets/date_picker_button.dart';
 import 'package:tasky/widgets/primary_button.dart';
 import 'package:tasky/widgets/secondary_button.dart';
+import 'package:tasky/widgets/time_picker_button.dart';
 
 class AddTaskPage extends StatefulWidget {
   const AddTaskPage({super.key});
@@ -26,7 +27,9 @@ class AddTaskPageState<T extends AddTaskPage> extends State<T> {
   TaskService taskService = getIt<TaskService>();
 
   DateTime startDate = DateTime.now();
+  TimeOfDay startTime = TimeOfDay.now();
   DateTime endDate = DateTime.now();
+  TimeOfDay endTime = TimeOfDay.now();
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
   Category category = Category.priority;
@@ -43,14 +46,70 @@ class AddTaskPageState<T extends AddTaskPage> extends State<T> {
   }
 
   void _createTask() {
+    DateTime startDateTime = DateTime(startDate.year, startDate.month,
+        startDate.day, startTime.hour, startTime.minute);
+    DateTime endDateTime = DateTime(
+        endDate.year, endDate.month, endDate.day, endTime.hour, endTime.minute);
     final newTask = Task(
         title: titleController.text,
-        startDate: startDate,
-        endDate: endDate,
+        startDate: startDateTime,
+        endDate: endDateTime,
         isChecked: false,
         description: descriptionController.text,
         category: category);
     taskService.create(newTask);
+  }
+
+  void _setStartDate(DateTime date) {
+    setState(() {
+      startDate = date;
+    });
+    if (date.isAfter(endDate)) {
+      setState(() {
+        endDate = date;
+      });
+    }
+  }
+
+  void _setEndDate(DateTime date) {
+    setState(() {
+      endDate = date;
+    });
+    if (date.isBefore(startDate)) {
+      setState(() {
+        startDate = date;
+      });
+    }
+  }
+
+  void _setStartTime(TimeOfDay time) {
+    setState(() {
+      startTime = time;
+    });
+    if (_isStartTimeAfterEndTime(time, endTime)) {
+      setState(() {
+        endTime = time;
+      });
+    }
+  }
+
+  void _setEndTime(TimeOfDay time) {
+    setState(() {
+      endTime = time;
+    });
+    if (_isStartTimeAfterEndTime(startTime, time)) {
+      setState(() {
+        startTime = time;
+      });
+    }
+  }
+
+  bool _isStartTimeAfterEndTime(TimeOfDay startTime, TimeOfDay endTime) {
+    DateTime startDateTime = DateTime(startDate.year, startDate.month,
+        startDate.day, startTime.hour, startTime.minute);
+    DateTime endDateTime = DateTime(
+        endDate.year, endDate.month, endDate.day, endTime.hour, endTime.minute);
+    return startDateTime.isAfter(endDateTime);
   }
 
   @override
@@ -132,13 +191,11 @@ class AddTaskPageState<T extends AddTaskPage> extends State<T> {
                             children: [
                               Text("Start",
                                   style: CustomTextStyle.title(context)),
-                              DateTimeButton(
-                                  date: startDate,
-                                  setDate: (DateTime date) {
-                                    setState(() {
-                                      startDate = date;
-                                    });
-                                  })
+                              DatePickerButton(
+                                  date: startDate, setDate: _setStartDate),
+                              const SizedBox(height: 8.0),
+                              TimePickerButton(
+                                  time: startTime, setTime: _setStartTime)
                             ],
                           ),
                         ),
@@ -149,13 +206,11 @@ class AddTaskPageState<T extends AddTaskPage> extends State<T> {
                             children: [
                               Text("End",
                                   style: CustomTextStyle.title(context)),
-                              DateTimeButton(
-                                  date: endDate,
-                                  setDate: (DateTime date) {
-                                    setState(() {
-                                      endDate = date;
-                                    });
-                                  })
+                              DatePickerButton(
+                                  date: endDate, setDate: _setEndDate),
+                              const SizedBox(height: 8.0),
+                              TimePickerButton(
+                                  time: endTime, setTime: _setEndTime)
                             ],
                           ),
                         )
