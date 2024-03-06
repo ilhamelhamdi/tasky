@@ -38,4 +38,10 @@ class TaskServiceImpl implements TaskService {
     task.isChecked = !task.isChecked;
     await repository.update(id, task);
   }
+
+  @override
+  Future<List<Task>> filterByCategory(String category) async {
+    var allTasks = await repository.getAll();
+    return allTasks.where((task) => task.category.name == category).toList();
+  }
 }
