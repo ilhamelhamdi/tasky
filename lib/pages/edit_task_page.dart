@@ -26,11 +26,15 @@ class _EditTaskPageState extends AddTaskPageState<EditTaskPage> {
 
   void getTask() async {
     task = await taskService.getById(widget.taskId);
-    titleController.text = task.title;
-    startDate = task.startDate;
-    endDate = task.endDate;
-    descriptionController.text = task.description;
-    category = task.category;
+    setState(() {
+      titleController.text = task.title;
+      startDate = task.startDate;
+      endDate = task.endDate;
+      startTime = TimeOfDay.fromDateTime(startDate);
+      endTime = TimeOfDay.fromDateTime(endDate);
+      descriptionController.text = task.description;
+      category = task.category;
+    });
   }
 
   @override
@@ -40,9 +44,14 @@ class _EditTaskPageState extends AddTaskPageState<EditTaskPage> {
   }
 
   void _updateTask() {
+    var startDateTime = DateTime(startDate.year, startDate.month, startDate.day,
+        startTime.hour, startTime.minute);
+    var endDateTime = DateTime(
+        endDate.year, endDate.month, endDate.day, endTime.hour, endTime.minute);
+
     task.title = titleController.text;
-    task.startDate = startDate;
-    task.endDate = endDate;
+    task.startDate = startDateTime;
+    task.endDate = endDateTime;
     task.description = descriptionController.text;
     task.category = category;
 

@@ -17,14 +17,28 @@ class DateTimeCard extends StatelessWidget {
         const SizedBox(height: 8.0),
         BoxContainer(
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(
                 Icons.calendar_today_rounded,
                 color: Theme.of(context).primaryColor,
               ),
               const SizedBox(width: 8.0),
-              Text(DateFormat('dd MMM yyyy | kk:mm').format(dateTime)),
+              Text(DateFormat('dd MMM yyyy').format(dateTime)),
+            ],
+          ),
+        ),
+        const SizedBox(height: 8.0),
+        BoxContainer(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.access_time_rounded,
+                color: Theme.of(context).primaryColor,
+              ),
+              const SizedBox(width: 8.0),
+              Text(DateFormat('kk:mm').format(dateTime)),
             ],
           ),
         )
