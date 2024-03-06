@@ -8,7 +8,7 @@ class ProfileData {
   static const String major = 'Ilmu Komputer';
   static const String dateOfBirth = '17 October 2003';
   static const String email = 'ilhamabdillah123@gmail.com';
-  static const String profileImage = 'images/profile.png';
+  static const String profileImage = 'assets/images/profile.png';
 }
 
 class ProfilePage extends StatelessWidget {
@@ -22,91 +22,90 @@ class ProfilePage extends StatelessWidget {
         width: MediaQuery.of(context).size.width,
         color: Theme.of(context).primaryColor,
       ),
-      CustomScrollView(
-          slivers: [
-            const SliverAppBar(
-              flexibleSpace: FlexibleSpaceBar(
-                title: Text("My Profile"),
-                centerTitle: true,
-                titlePadding: EdgeInsets.only(bottom: 16.0),
-              ),
-              pinned: true,
-              stretch: true,
-              expandedHeight: 200,
-              collapsedHeight: 80,
-              backgroundColor: Colors.transparent,
-              foregroundColor: Colors.white,
-              surfaceTintColor: Colors.transparent,
-            ),
-            SliverToBoxAdapter(
-                child: Container(
-                    padding: const EdgeInsets.all(16.0),
-                    constraints: BoxConstraints(
-                      minHeight: MediaQuery.of(context).size.height - 160,
+      CustomScrollView(slivers: [
+        const SliverAppBar(
+          flexibleSpace: FlexibleSpaceBar(
+            title: Text("My Profile"),
+            centerTitle: true,
+            titlePadding: EdgeInsets.only(bottom: 16.0),
+          ),
+          pinned: true,
+          stretch: true,
+          expandedHeight: 200,
+          collapsedHeight: 80,
+          backgroundColor: Colors.transparent,
+          foregroundColor: Colors.white,
+          surfaceTintColor: Colors.transparent,
+        ),
+        SliverToBoxAdapter(
+            child: Container(
+                padding: const EdgeInsets.all(16.0),
+                constraints: BoxConstraints(
+                  minHeight: MediaQuery.of(context).size.height - 160,
+                ),
+                width: MediaQuery.of(context).size.width,
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius:
+                      BorderRadius.vertical(top: Radius.circular(36.0)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Align(
+                      alignment: Alignment.center,
+                      child: CircleAvatar(
+                        radius: 80,
+                        backgroundColor:
+                            Theme.of(context).colorScheme.secondary,
+                        backgroundImage:
+                            const AssetImage(ProfileData.profileImage),
+                      ),
                     ),
-                    width: MediaQuery.of(context).size.width,
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
-                      borderRadius:
-                          BorderRadius.vertical(top: Radius.circular(36.0)),
+                    const SizedBox(height: 16.0),
+                    Text(
+                      "Name",
+                      style: CustomTextStyle.title(context),
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    const BoxContainer(child: Text(ProfileData.name)),
+                    const SizedBox(height: 16.0),
+                    Text(
+                      "Nickname",
+                      style: CustomTextStyle.title(context),
+                    ),
+                    const BoxContainer(child: Text(ProfileData.nickname)),
+                    const SizedBox(height: 16.0),
+                    Text(
+                      "Major",
+                      style: CustomTextStyle.title(context),
+                    ),
+                    const BoxContainer(child: Text(ProfileData.major)),
+                    const SizedBox(height: 16.0),
+                    Text(
+                      "Date of Birth",
+                      style: CustomTextStyle.title(context),
+                    ),
+                    BoxContainer(
+                        child: Row(
                       children: [
-                        Align(
-                          alignment: Alignment.center,
-                          child: CircleAvatar(
-                            radius: 80,
-                            backgroundColor:
-                                Theme.of(context).colorScheme.secondary,
-                            backgroundImage:
-                                const AssetImage(ProfileData.profileImage),
-                          ),
+                        Icon(
+                          Icons.calendar_today,
+                          color: Theme.of(context).primaryColor,
                         ),
-                        const SizedBox(height: 16.0),
-                        Text(
-                          "Name",
-                          style: CustomTextStyle.title(context),
-                        ),
-                        const BoxContainer(child: Text(ProfileData.name)),
-                        const SizedBox(height: 16.0),
-                        Text(
-                          "Nickname",
-                          style: CustomTextStyle.title(context),
-                        ),
-                        const BoxContainer(child: Text(ProfileData.nickname)),
-                        const SizedBox(height: 16.0),
-                        Text(
-                          "Major",
-                          style: CustomTextStyle.title(context),
-                        ),
-                        const BoxContainer(child: Text(ProfileData.major)),
-                        const SizedBox(height: 16.0),
-                        Text(
-                          "Date of Birth",
-                          style: CustomTextStyle.title(context),
-                        ),
-                        BoxContainer(
-                            child: Row(
-                          children: [
-                            Icon(
-                              Icons.calendar_today,
-                              color: Theme.of(context).primaryColor,
-                            ),
-                            const SizedBox(width: 8.0),
-                            const Text(ProfileData.dateOfBirth),
-                          ],
-                        )),
-                        const SizedBox(height: 16.0),
-                        Text(
-                          "Email",
-                          style: CustomTextStyle.title(context),
-                        ),
-                        const BoxContainer(child: Text(ProfileData.email)),
-                        const SizedBox(height: 16.0),
+                        const SizedBox(width: 8.0),
+                        const Text(ProfileData.dateOfBirth),
                       ],
-                    )))
-          ])
+                    )),
+                    const SizedBox(height: 16.0),
+                    Text(
+                      "Email",
+                      style: CustomTextStyle.title(context),
+                    ),
+                    const BoxContainer(child: Text(ProfileData.email)),
+                    const SizedBox(height: 16.0),
+                  ],
+                )))
+      ])
     ]);
   }
 }
