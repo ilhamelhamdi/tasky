@@ -23,8 +23,8 @@ class MyApp extends StatelessWidget {
         textTheme: GoogleFonts.poppinsTextTheme(Theme.of(context).textTheme),
         colorScheme: ColorScheme.fromSeed(
             seedColor: Colors.white,
-            primary: const Color(0xff4c39b5),
-            secondary: const Color(0x884c39b5),
+            primary: const Color(0xff7f4123),
+            secondary: const Color(0x887f4123),
             surfaceTint: Colors.transparent),
         useMaterial3: true,
       ),
